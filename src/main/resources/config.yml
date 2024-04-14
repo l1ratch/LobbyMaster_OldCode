@@ -14,31 +14,6 @@ Fire: false # запрет распространения огня и сгора
 GameMode: null # установка режима игры (ADVENTURE - приключения, SURVIVAL - выживание, CREATIVE - креатив, null - отключение функции)
 Weather: false # запрет погоды
 
-## НАСТРОЙКА СООБЩЕНИЙ О ВХОДЕ/ВЫХОДЕ/СМЕРТИ ИГРОКА (%player% - ник игрока)
-StartMessage:
-  Allow: false # true - кастомное сообщение или отключение, false - стандартное сообщение
-
-  #(Замены: %player% - никнейм игрока, null - отключает сообщение)
-  joinM: "%player% &cзашел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст входа игрока
-  quitM: "%player% &cвышел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст выхода игрока
-  deathM: "%player% &cпогиб! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст смерти игрока
-
-## НАСТРОЙКИ ЧАТА/КОМАНД
-Chat: false # отключает чат
-Commands: false # отключает возможность писать команды (исключения указывать тут: allow_cmd: )
-NoChatText: "&cВы не можете писать в чат! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке написать в чат (работает только когда Chat: true)
-NoCommandsText: "&cВы не можете писать в чат! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке выполнить команду (Commands: true)
-allow_cmd: #Команды которые можно писать при Commands: true
-  - 'skins'
-  - 'skin'
-  - 'reg'
-  - 'register'
-  - 'l'
-  - 'login'
-  - 'cp'
-  - 'changepassword'
-  - 'menu'
-
 ## НАСТРОЙКА ЭФФЕКТОВ
 giveInvisibility: false # выдача эффекта невидимости при заходе
 giveJump: false # выдача эффекта прыгучести при заходе
@@ -60,6 +35,31 @@ Spawn:
     z: ''
     yaw: ''
     pitch: ''
+
+## НАСТРОЙКИ ЧАТА/КОМАНД
+Chat: false # отключает чат
+Commands: false # отключает возможность писать команды (исключения указывать тут: allow_cmd: )
+NoChatText: "&cВы не можете писать в чат! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке написать в чат (работает только когда Chat: true)
+NoCommandsText: "&cВы не можете писать в чат! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке выполнить команду (Commands: true)
+allow_cmd: #Команды которые можно писать при Commands: true
+  - 'skins'
+  - 'skin'
+  - 'reg'
+  - 'register'
+  - 'l'
+  - 'login'
+  - 'cp'
+  - 'changepassword'
+  - 'menu'
+
+## НАСТРОЙКА СООБЩЕНИЙ О ВХОДЕ/ВЫХОДЕ/СМЕРТИ ИГРОКА (%player% - ник игрока)
+StartMessage:
+  Allow: false # true - кастомное сообщение или отключение, false - стандартное сообщение
+
+  #(Замены: %player% - никнейм игрока, null - отключает сообщение)
+  joinM: "%player% &cзашел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст входа игрока
+  quitM: "%player% &cвышел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст выхода игрока
+  deathM: "%player% &cпогиб! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст смерти игрока
 
 ## НАТСРОЙКИ СООБЩЕНИЙ ПРИВЕТСТВИЯ И НАЧАЛЬНЫХ КОМАНД
 JoinMessage: #Сообщение при входе (%player% - ник игрока)
@@ -93,7 +93,8 @@ JoinCommands:
       - ''
 
 ## ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ
+#  (!!! Пока в списке доп функций только разрешение полета !!!)
 DonateFunctions:
-  Allow: false # выдача возможности полёта для игрока с правом: lobbymaster.donate
+  Allow: false # Включение доп функций, доступных игрокам с правом: lobbymaster.donate
   PremNotice: "&c&lСервер >> &aРежим полета вкл!"
   NoPermMessage: "&c&lСервер >> &aЧтобы пользоваться полетом купите донат!"
