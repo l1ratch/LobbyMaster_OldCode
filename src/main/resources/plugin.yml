@@ -4,5 +4,22 @@ main: l1ratch.lobbymaster.LobbyMaster
 load: STARTUP
 authors: [ l1ratch ]
 commands:
-  LobbyMaster:
-    aliases: [ lobbymaster, lm ]
+  gmc:
+    usage: /gmc
+  gms:
+    usage: /gms
+  gma:
+    usage: /gma
+  gmsp:
+    usage: /gmsp
+  lm:
+    usage: /lm
+    aliases:
+      - lobbymaster
+      - LobbyMaster
+      - LM
+    permission: lobbymaster.admin
+permissions:
+  lobbymaster.admin:
+    description: Allows the player to reload the plugin configuration
+    default: op

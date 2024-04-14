@@ -1,7 +1,10 @@
 # Плагин LobbyMaster! Плагин позволяет настраивать различные функции на сервере Лобби.
-# Аргументы: true - запрет включен, false - запрет выключен, пустое поле(как-то так: "") - null.
-# lobbymaster.admin - отменяет действия пунктов(Break, Place, Chat, Commands), дает Fly, дает доступ к команде /LobbyMaster или /lm
+# lobbymaster.admin - отменяет действия пунктов(Break, Place, Chat, Commands), включает доп.функции, дает доступ к команде /LobbyMaster или /lm
 # Написал: vk.com/l1ratch
+
+# !!! Аргументы/Заполнители: true - запрет включен, false - запрет выключен, null - пустое поле(как-то так: "").
+
+noPerm: '&cУ вас нет прав!'
 
 ## БАЗОВЫЕ НАСТРОЙКИ
 IceMelt: false # запрет таяния
@@ -39,9 +42,9 @@ Spawn:
 ## НАСТРОЙКИ ЧАТА/КОМАНД
 Chat: false # отключает чат
 Commands: false # отключает возможность писать команды (исключения указывать тут: allow_cmd: )
-NoChatText: "&cВы не можете писать в чат! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке написать в чат (работает только когда Chat: true)
-NoCommandsText: "&cВы не можете писать в чат! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке выполнить команду (Commands: true)
-allow_cmd: #Команды которые можно писать при Commands: true
+NoChatText: "&cЧат выключен! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке написать в чат
+NoCommandsText: "&cЭту команду использовать запрещено! &b(Изменить можно в plugins/LobbyMaster/config.yml)" # Текст, который пишет плагин при попытке выполнить команду
+allow_cmd: #Команды, дступные при включении блокировки команд!
   - 'skins'
   - 'skin'
   - 'reg'
@@ -57,9 +60,9 @@ StartMessage:
   Allow: false # true - кастомное сообщение или отключение, false - стандартное сообщение
 
   #(Замены: %player% - никнейм игрока, null - отключает сообщение)
-  joinM: "%player% &cзашел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст входа игрока
-  quitM: "%player% &cвышел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст выхода игрока
-  deathM: "%player% &cпогиб! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст смерти игрока
+  join: "%player% &cзашел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст входа игрока
+  quit: "%player% &cвышел! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст выхода игрока
+  death: "%player% &cпогиб! &b(Изменить можно в plugins/LobbyMaster/config.yml)" #Текст смерти игрока
 
 ## НАТСРОЙКИ СООБЩЕНИЙ ПРИВЕТСТВИЯ И НАЧАЛЬНЫХ КОМАНД
 JoinMessage: #Сообщение при входе (%player% - ник игрока)

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyMaster extends JavaPlugin implements Listener {
-    private static final String prefix = "§7[§aLinksLobby§7]§8 ";
+    private static final String prefix = "§7[§aLobbyMaster§7]§8 ";
     private static LobbyMaster instance;
     public static ArrayList<String> allow_cmd;
     public static ArrayList<String> player_cmd;
@@ -38,6 +38,7 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
+
         // Зона работы с кфг
         final File f = new File(this.getDataFolder() + File.separator + "config.yml");
         if (!f.exists()) {
@@ -45,22 +46,30 @@ public class LobbyMaster extends JavaPlugin implements Listener {
             log("Файл конфигурации не был найден! Создаю новый...");
         }
         loadConfig(getConfig());
+
         // Зона запуска элементов плагина
         if (getConfig().getBoolean("Time.Allow")) {
             for (World w : Bukkit.getServer().getWorlds()) {
-                w.setTime(getConfig().getLong("SetTime"));
+                w.setTime(getConfig().getLong("Time.SetTime"));
                 w.setGameRuleValue("doDaylightCycle", "false");
                 log("Имя модифицируемого мира: " + w.getName());
             }
         }
-        registerCommands();
+
+        //registerCommands();
+        this.getCommand("lm").setExecutor(new Commands());
+        this.getCommand("gmc").setExecutor(new Commands());
+        this.getCommand("gms").setExecutor(new Commands());
+        this.getCommand("gma").setExecutor(new Commands());
+        this.getCommand("gmsp").setExecutor(new Commands());
+
         Bukkit.getPluginManager().registerEvents(new DonFunctions(), this);
         Bukkit.getPluginManager().registerEvents(new Messager(), this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new BlockCMD(), this);
         log("----------------------------------");
         log(" Плагин §aLobbyMaster §8включен!  ");
-        log(" Написал: l1ratch(vk.com/l1ratch) ");
+        log(" Написал: l1ratch                 ");
         log("----------------------------------");
     }
 
@@ -72,12 +81,8 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public void onDisable() {
         log("----------------------------------");
         log(" Плагин §aLobbyMaster §8выключен! ");
-        log(" Написал: l1ratch(vk.com/l1ratch) ");
+        log(" Написал: l1ratch                 ");
         log("----------------------------------");
-    }
-
-    public void registerCommands() {
-        getCommand("lobbymaster").setExecutor(new PluginCommad());
     }
 
     @EventHandler
@@ -97,10 +102,10 @@ public class LobbyMaster extends JavaPlugin implements Listener {
             p.teleport(new Location (Bukkit.getWorlds().get(0), getConfig().getInt("Spawn.location.x"), getConfig().getInt("Spawn.location.y"), getConfig().getInt("Spawn.location.z"), getConfig().getInt("Spawn.location.yaw"), getConfig().getInt("Spawn.location.pitch")));
         }
         if (getConfig().getBoolean("StartMessage.Allow")) {
-            if (getConfig().getString("StartMessage.joinM") == null)
+            if (getConfig().getString("StartMessage.join") == null)
                 e.setJoinMessage("");
             else {
-                e.setJoinMessage(getConfig().getString("StartMessage.joinM").replaceAll("&", "§").replaceAll("%player%", p.getName()));
+                e.setJoinMessage(getConfig().getString("StartMessage.join").replaceAll("&", "§").replaceAll("%player%", p.getName()));
             }
         }
         if (getConfig().getBoolean("giveInvisibility"))
@@ -143,10 +148,10 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         if (getConfig().getBoolean("StartMessage.Allow")) {
-            if (getConfig().getString("StartMessage.quitM") == null) {
+            if (getConfig().getString("StartMessage.quit") == null) {
                 e.setQuitMessage("");
             } else {
-                e.setQuitMessage(getConfig().getString("StartMessage.quitM").replaceAll("&", "§").replaceAll("%player%", p.getName()));
+                e.setQuitMessage(getConfig().getString("StartMessage.quit").replaceAll("&", "§").replaceAll("%player%", p.getName()));
             }
         }
     }
@@ -155,11 +160,11 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public void onDeath(PlayerDeathEvent e) {
         Player p = e.getEntity();
         if (getConfig().getBoolean("StartMessage.Allow")) {
-            if (getConfig().getString("StartMessage.deathM") == null) {
+            if (getConfig().getString("StartMessage.death") == null) {
                 e.setDeathMessage("");
             }
             else {
-                e.setDeathMessage(getConfig().getString("StartMessage.deathM").replaceAll("&", "§").replaceAll("%player%", p.getName()));
+                e.setDeathMessage(getConfig().getString("StartMessage.death").replaceAll("&", "§").replaceAll("%player%", p.getName()));
             }
         }
     }
