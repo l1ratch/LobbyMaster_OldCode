@@ -1,4 +1,8 @@
 name: LobbyMaster
 version: '${project.version}'
 main: l1ratch.lobbymaster.LobbyMaster
-api-version: '1.19'
+load: STARTUP
+authors: [ l1ratch ]
+commands:
+  LobbyMaster:
+    aliases: [ lobbymaster, lm ]

@@ -1,8 +1,7 @@
 package l1ratch.lobbymaster;
 
-
 import org.bukkit.*;
-import org.bukkit.command.CommandExecutor;
+//import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,8 +29,6 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public static ArrayList<String> console_cmd;
     public static String disable_cmd;
 
-    public static String world;
-
     // #Создание другого конфига
     // public File file = new File(getDataFolder() + File.separator + "DonConfig.yml");
     // public FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
@@ -41,11 +38,14 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
+        // Зона работы с кфг
         final File f = new File(this.getDataFolder() + File.separator + "config.yml");
         if (!f.exists()) {
             saveDefaultConfig();
             log("Файл конфигурации не был найден! Создаю новый...");
         }
+        loadConfig(getConfig());
+        // Зона запуска элементов плагина
         if (getConfig().getBoolean("Time.Allow")) {
             for (World w : Bukkit.getServer().getWorlds()) {
                 w.setTime(getConfig().getLong("SetTime"));
@@ -57,7 +57,6 @@ public class LobbyMaster extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DonFunctions(), this);
         Bukkit.getPluginManager().registerEvents(new Messager(), this);
         getServer().getPluginManager().registerEvents(this, this);
-        loadConfig(getConfig());
         getServer().getPluginManager().registerEvents(new BlockCMD(), this);
         log("----------------------------------");
         log(" Плагин §aLobbyMaster §8включен!  ");
@@ -78,19 +77,21 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     }
 
     public void registerCommands() {
-        getCommand("LobbyMaster").setExecutor((CommandExecutor)new PluginCommad());
+        getCommand("lobbymaster").setExecutor(new PluginCommad());
     }
 
     @EventHandler
     public void FoodLevel(FoodLevelChangeEvent e) {
-        if (getConfig().getBoolean("Hunger"))
+        if (getConfig().getBoolean("Hunger")){
             e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        new Cooldown(p).runTaskTimer(this, 0L, 20L);
+        // Поменял чтобы кулдауны работали асинхронно
+        new Cooldown(p).runTaskTimerAsynchronously(this, 0L, 20L);
         p.getActivePotionEffects().clear();
         if(getConfig().getBoolean("Spawn.Allow")){
             p.teleport(new Location (Bukkit.getWorlds().get(0), getConfig().getInt("Spawn.location.x"), getConfig().getInt("Spawn.location.y"), getConfig().getInt("Spawn.location.z"), getConfig().getInt("Spawn.location.yaw"), getConfig().getInt("Spawn.location.pitch")));
@@ -119,21 +120,21 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     @EventHandler
     public void JoinCommand(PlayerLoginEvent e){
         Player p = e.getPlayer();
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
-            @Override
-            public void run() {
-                if (getInstance().getConfig().getBoolean("JoinCommands.Player.Allow")){
-                    List<String> list = getInstance().getConfig().getStringList("JoinCommands.Player.cmd");
-                    for(int i = 0; i < list.size(); i++) {
-                        p.chat("/" + list.get(i).replaceAll("&", "§").replaceAll("%player%", p.getName()));
-                    }
-                }
-                if (getInstance().getConfig().getBoolean("JoinCommands.Console.Allow")){
-                    List<String> list = getInstance().getConfig().getStringList("JoinCommands.Console.cmd");
-                    for(int i = 0; i < list.size(); i++) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), list.get(i).replaceAll("&", "§").replaceAll("%player%", p.getName()));
-                    }
-                }
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
+            if (getInstance().getConfig().getBoolean("JoinCommands.Player.Allow")){
+                List<String> list = getInstance().getConfig().getStringList("JoinCommands.Player.cmd");
+                //for (int i = 0; i < list.size(); i++) {
+                //  p.chat("/" + list.get(i).replaceAll("&", "§").replaceAll("%player%", p.getName()));
+                // }
+                // Научись работать со stream()
+                list.forEach(msg -> p.chat("/" + msg.replaceAll("&", "§").replaceAll("%player%", p.getName())));
+            }
+            if (getInstance().getConfig().getBoolean("JoinCommands.Console.Allow")){
+                List<String> list = getInstance().getConfig().getStringList("JoinCommands.Console.cmd");
+                //for(int i = 0; i < list.size(); i++) {
+                //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), list.get(i).replaceAll("&", "§").replaceAll("%player%", p.getName()));
+                //}
+                list.forEach(msg -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), msg.replaceAll("&", "§").replaceAll("%player%", p.getName())));
             }
         }, getInstance().getConfig().getInt("JoinCommands.Ticks"));
     }
@@ -221,11 +222,10 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     }
 
     public static String replacer(String what) {
-        return ChatColor.translateAlternateColorCodes('&', what);
+        return what.replaceAll("&", "§");
     }
 
     public static void loadConfig(FileConfiguration cfg) {
-        world = replacer(cfg.getString("World"));
         disable_cmd = replacer(cfg.getString("NoCommandsText"));
         allow_cmd = (ArrayList<String>)cfg.getStringList("allow_cmd");
         player_cmd = (ArrayList<String>)cfg.getStringList("JoinCommands.CommandsPlayer");
@@ -239,4 +239,5 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public static String getPrefix() {
         return prefix;
     }
+
 }
