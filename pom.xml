@@ -6,7 +6,7 @@
 
   <groupId>l1ratch</groupId>
   <artifactId>LobbyMaster</artifactId>
-  <version>v1.1</version>
+  <version>v1.0</version>
   <packaging>jar</packaging>
 
   <name>LobbyMaster</name>
