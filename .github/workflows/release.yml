@@ -33,8 +33,11 @@ jobs:
           TAG_EXISTS=false
           NEXT_VERSION=$BASE_VERSION
           
+          # Remove "v" prefix if it exists
+          CLEAN_VERSION=${BASE_VERSION#v}
+
           # Extract the base version number (e.g., 1.0.0)
-          BASE=$(echo $BASE_VERSION | grep -oP '(\d+\.\d+\.\d+)')
+          BASE=$(echo $CLEAN_VERSION | grep -oP '(\d+\.\d+\.\d+)?' || echo $CLEAN_VERSION)
 
           # Check if the base version tag exists
           if git rev-parse "v$BASE" >/dev/null 2>&1; then
@@ -42,6 +45,7 @@ jobs:
 
             # Loop to find the next available patch version
             IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE"
+            PATCH=${PATCH:-0}
             while git rev-parse "v$MAJOR.$MINOR.$PATCH" >/dev/null 2>&1; do
               PATCH=$((PATCH + 1))
             done
@@ -50,6 +54,7 @@ jobs:
 
           echo "FINAL_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "TAG_EXISTS=$TAG_EXISTS" >> $GITHUB_ENV
+
 
       - name: Create GitHub Release
         if: ${{ env.TAG_EXISTS == 'false' }}
