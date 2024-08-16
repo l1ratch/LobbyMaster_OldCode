@@ -23,13 +23,13 @@ import static l1ratch.lobbymaster.LobbyMaster.getInstance;
                 if (sender instanceof Player) {
                     Player player = (Player) sender;
                     if (player.hasPermission("lobbymaster.admin")) {
-                        sender.sendMessage("§a§lДоступные аргументы: §6§l/LobbyMaster <reload | help | setspawn>");
+                        sender.sendMessage(getInstance().txtPrefix + "§a§lДоступные аргументы: §6§l/LobbyMaster <reload | help | setspawn>");
                         return true;
                     } else {
                         player.sendMessage(getInstance().getConfig().getString("noPerm").replaceAll("&", "§"));
                     }
                 } else {
-                    sender.sendMessage("§a§lДоступные аргументы: §6§l/LobbyMaster <reload | help | setspawn>");
+                    sender.sendMessage("§a§lДоступные аргументы: §6§l/LobbyMaster <reload>");
                     return true;
                 }
                 return true;
@@ -40,13 +40,13 @@ import static l1ratch.lobbymaster.LobbyMaster.getInstance;
                     Player player = (Player) sender;
                     if (player.hasPermission("lobbymaster.admin")) {
                         plugin.reloadConfig();
-                        player.sendMessage("§c§lКонфиг плагина LobbyMaster перезагружен!");
+                        player.sendMessage(getInstance().txtPrefix + "§c§lКонфиг плагина LobbyMaster перезагружен!");
                     } else {
                         player.sendMessage(getInstance().getConfig().getString("noPerm").replaceAll("&", "§"));
                     }
                 } else {
                     plugin.reloadConfig();
-                    sender.sendMessage("§c§lКонфиг плагина LobbyMaster перезагружен!");
+                    sender.sendMessage(getInstance().txtPrefix + "§c§lКонфиг плагина LobbyMaster перезагружен!");
                 }
                 return true;
             }
@@ -74,7 +74,7 @@ import static l1ratch.lobbymaster.LobbyMaster.getInstance;
                         getInstance().getConfig().set("Spawn.location.yaw", player.getLocation().getYaw());
                         getInstance().getConfig().set("Spawn.location.pitch", player.getLocation().getPitch());
                         getInstance().saveConfig();
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8» &aТочка спавна установлена"));
+                        player.sendMessage(getInstance().txtPrefix + ChatColor.translateAlternateColorCodes('&', "&8» &aТочка спавна установлена"));
                     } else {
                         player.sendMessage(getInstance().getConfig().getString("noPerm").replaceAll("&", "§"));
                     }
@@ -84,7 +84,7 @@ import static l1ratch.lobbymaster.LobbyMaster.getInstance;
 
         
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§c§lOnly players can use this command.");
+            sender.sendMessage(getInstance().txtPrefix + "§c§lOnly players can use this command.");
             return true;
         }
 
@@ -92,22 +92,22 @@ import static l1ratch.lobbymaster.LobbyMaster.getInstance;
         if (player.hasPermission("lobbymaster.admin")){
             if (command.getName().equalsIgnoreCase("gmc")) {
                 player.setGameMode(GameMode.CREATIVE);
-                player.sendMessage("§7Режим §cКреатива §7включен!");
+                player.sendMessage(getInstance().txtPrefix + "§7Режим §cКреатива §7включен!");
                 return true;
             }
             if (command.getName().equalsIgnoreCase("gms")) {
                 player.setGameMode(GameMode.SURVIVAL);
-                player.sendMessage("§7Режим §aВыживания §7включен!");
+                player.sendMessage(getInstance().txtPrefix + "§7Режим §aВыживания §7включен!");
                 return true;
             }
             if (command.getName().equalsIgnoreCase("gma")) {
                 player.setGameMode(GameMode.ADVENTURE);
-                player.sendMessage("§7Режим §9Приключения §7включен!");
+                player.sendMessage(getInstance().txtPrefix + "§7Режим §9Приключения §7включен!");
                 return true;
             }
             if (command.getName().equalsIgnoreCase("gmsp")) {
                 player.setGameMode(GameMode.SPECTATOR);
-                player.sendMessage("§7Режим §6Наблюдателя §7включен!");
+                player.sendMessage(getInstance().txtPrefix + "§7Режим §6Наблюдателя §7включен!");
                 return true;
             }
         } else{

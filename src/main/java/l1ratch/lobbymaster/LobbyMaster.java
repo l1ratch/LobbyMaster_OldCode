@@ -28,6 +28,7 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public static ArrayList<String> player_cmd;
     public static ArrayList<String> console_cmd;
     public static String disable_cmd;
+    public static String txtPrefix;
 
     // #Создание другого конфига
     // public File file = new File(getDataFolder() + File.separator + "DonConfig.yml");
@@ -235,6 +236,7 @@ public class LobbyMaster extends JavaPlugin implements Listener {
         allow_cmd = (ArrayList<String>)cfg.getStringList("allow_cmd");
         player_cmd = (ArrayList<String>)cfg.getStringList("JoinCommands.CommandsPlayer");
         console_cmd = (ArrayList<String>)cfg.getStringList("JoinCommands.CommandsConsole");
+        txtPrefix = replacer(cfg.getString("txtPrefix"));
     }
 
     public static void log(String message) {
