@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, 'Package Plugin')
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +16,7 @@ jobs:
       - name: Set up JDK 1.8
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'  # Указываем дистрибуцию JDK
+          distribution: 'temurin'
           java-version: '8'
 
       - name: Build with Maven
@@ -27,13 +26,37 @@ jobs:
         id: extract_version
         run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
-      - name: Check if tag exists
-        id: check_tag
+      - name: Check if tag exists and determine next version
+        id: determine_version
         run: |
-          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          BASE_VERSION=${{ env.VERSION }}
+          TAG_EXISTS=false
+          
+          # Remove "v" prefix if it exists
+          CLEAN_VERSION=${BASE_VERSION#v}
+
+          # Extract the base version number (e.g., 1.0.0)
+          BASE=$(echo $CLEAN_VERSION | grep -oP '(\d+\.\d+\.\d+)' || echo $CLEAN_VERSION)
+          
+          # Initialize the next version with the current base version
+          NEXT_VERSION=$BASE
+
+          # Check if the base version tag exists and determine the next available patch version
+          if git rev-parse "v$BASE" >/dev/null 2>&1; then
+            TAG_EXISTS=true
+
+            # Loop to find the next available patch version
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE"
+            PATCH=${PATCH:-0}
+            while git rev-parse "v$MAJOR.$MINOR.$PATCH" >/dev/null 2>&1; do
+              PATCH=$((PATCH + 1))
+            done
+            NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+          fi
+
+          FINAL_VERSION="v$NEXT_VERSION"
+          echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
+          echo "TAG_EXISTS=$TAG_EXISTS" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         id: create_release
@@ -41,17 +64,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: ${{ env.VERSION }}
-          release_name: ${{ env.VERSION }} (Release ${{ steps.check_tag.outputs.index }})
+          tag_name: ${{ env.FINAL_VERSION }}
+          release_name: ${{ env.FINAL_VERSION }}
           body: ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
-          if: ${{ env.TAG_EXISTS == 'false' }}
 
       - name: Upload .jar to Release
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/*.jar
-          asset_name: GameModeSwitcher-${{ env.VERSION }}.jar
+          asset_path: target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar
+          asset_name: LobbyMaster-${{ env.FINAL_VERSION }}.jar
           asset_content_type: application/java-archive
