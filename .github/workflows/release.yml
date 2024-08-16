@@ -38,7 +38,7 @@ jobs:
 
           # Extract the base version number (e.g., 1.0.0)
           BASE=$(echo $CLEAN_VERSION | grep -oP '(\d+\.\d+\.\d+)?' || echo $CLEAN_VERSION)
-
+          
           # Check if the base version tag exists
           if git rev-parse "v$BASE" >/dev/null 2>&1; then
             TAG_EXISTS=true
@@ -54,7 +54,6 @@ jobs:
 
           echo "FINAL_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "TAG_EXISTS=$TAG_EXISTS" >> $GITHUB_ENV
-
 
       - name: Create GitHub Release
         if: ${{ env.TAG_EXISTS == 'false' }}
@@ -74,6 +73,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/*.jar
-          asset_name: GameModeSwitcher-v${{ env.FINAL_VERSION }}.jar
+          asset_path: target/LobbyMaster-v${{ env.FINAL_VERSION }}-shaded.jar
+          asset_name: LobbyMaster-v${{ env.FINAL_VERSION }}.jar
           asset_content_type: application/java-archive
