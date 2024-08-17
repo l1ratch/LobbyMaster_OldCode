@@ -45,18 +45,16 @@ jobs:
         id: determine_version
         run: |
           BASE_VERSION=${{ env.VERSION }}
-
-          # Определение последнего тега с соответствующей версией
-          LATEST_TAG=$(git tag -l "v${BASE_VERSION}.*" --sort=-v:refname | head -n 1)
           
-          if [ -z "$LATEST_TAG" ]; then
-            NEXT_VERSION="${BASE_VERSION}.0"
-          else
-            # Извлечение патча из последнего тега и его увеличение
-            LATEST_PATCH=$(echo $LATEST_TAG | grep -oP '(?<=v'"$BASE_VERSION"'\.)[0-9]+$')
-            NEXT_PATCH=$((LATEST_PATCH + 1))
-            NEXT_VERSION="${BASE_VERSION}.${NEXT_PATCH}"
-          fi
+          # Инициализация патча с 0
+          PATCH=0
+          NEXT_VERSION="$BASE_VERSION.$PATCH"
+
+          # Последовательно увеличивать патч до тех пор, пока не найдем свободный тег
+          while git rev-parse "v$NEXT_VERSION" >/dev/null 2>&1; do
+            PATCH=$((PATCH + 1))
+            NEXT_VERSION="$BASE_VERSION.$PATCH"
+          done
 
           FINAL_VERSION="v$NEXT_VERSION"
 
