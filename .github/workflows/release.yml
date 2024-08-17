@@ -45,23 +45,22 @@ jobs:
         id: determine_version
         run: |
           BASE_VERSION=${{ env.VERSION }}
-          
-          # Initialize the next version with the current base version
-          NEXT_VERSION=$BASE_VERSION
-          
-          # Split version into major, minor, patch
+
+          # Инициализация переменных для определения версии
           IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE_VERSION"
           PATCH=${PATCH:-0}
-          
-          # Loop to find the next available patch version
-          while git rev-parse "v$MAJOR.$MINOR.$PATCH" >/dev/null 2>&1; do
+          NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+
+          # Поиск следующей доступной версии
+          while git rev-parse "v$NEXT_VERSION" >/dev/null 2>&1; do
             PATCH=$((PATCH + 1))
+            NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
           done
 
-          NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
           FINAL_VERSION="v$NEXT_VERSION"
 
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
+          echo "Determined next available version: $FINAL_VERSION"
 
       - name: Build with Maven
         run: mvn clean package -Dproject.version=${{ env.FINAL_VERSION }}
