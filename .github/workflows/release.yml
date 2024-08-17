@@ -12,6 +12,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Загружаем все коммиты и теги
+
+      - name: Fetch all tags
+        run: git fetch --tags
 
       - name: Set up JDK 1.8
         uses: actions/setup-java@v3
@@ -40,6 +45,9 @@ jobs:
           
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+
+      - name: List all tags for debugging
+        run: git tag -l
 
       - name: Determine the next available version
         id: determine_version
