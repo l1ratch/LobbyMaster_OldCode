@@ -27,19 +27,14 @@ jobs:
       - name: Extract version and description from commit message
         id: extract_info
         run: |
-          # Извлечение версии из текста коммита
           VERSION=$(git log -1 --pretty=%B | grep -oP 'int_ver: \K[\d.]+')
-          
           if [ -z "$VERSION" ]; then
             echo "Version not found in commit message"
             exit 1
           fi
 
-          # Извлечение описания из текста коммита
           DESCRIPTION=$(git log -1 --pretty=%B | grep -oP 'Изменения: \K.*')
-          
           if [ -z "$DESCRIPTION" ]; then
-            echo "Description not found in commit message"
             DESCRIPTION="No detailed description provided."
           fi
           
@@ -53,12 +48,9 @@ jobs:
         id: determine_version
         run: |
           BASE_VERSION=${{ env.VERSION }}
-          
-          # Инициализация патча с 0
           PATCH=0
           NEXT_VERSION="$BASE_VERSION.$PATCH"
 
-          # Последовательно увеличивать патч до тех пор, пока не найдем свободный тег
           while git rev-parse "v$NEXT_VERSION" >/dev/null 2>&1; do
             PATCH=$((PATCH + 1))
             NEXT_VERSION="$BASE_VERSION.$PATCH"
@@ -71,6 +63,9 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package -Dproject.version=${{ env.FINAL_VERSION }}
+
+      - name: Rename JAR file to match version
+        run: mv target/LobbyMaster-*.jar target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar
 
       - name: Create GitHub Release
         id: create_release
