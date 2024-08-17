@@ -19,26 +19,38 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
 
-      - name: Build with Maven
-        run: mvn clean package
+      - name: Extract version and description from commit message
+        id: extract_info
+        run: |
+          # Извлечение версии из текста коммита
+          VERSION=$(git log -1 --pretty=%B | grep -oP 'int_ver: \K[\d.]+')
+          
+          if [ -z "$VERSION" ]; then
+            echo "Version not found in commit message"
+            exit 1
+          fi
 
-      - name: Extract version from pom.xml
-        id: extract_version
-        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          # Извлечение описания из текста коммита
+          DESCRIPTION=$(git log -1 --pretty=%B | grep -oP 'Изменения: \K.*')
+          
+          if [ -z "$DESCRIPTION" ]; then
+            echo "Description not found in commit message"
+            DESCRIPTION="No detailed description provided."
+          fi
+          
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
 
       - name: Determine the next available version
         id: determine_version
         run: |
           BASE_VERSION=${{ env.VERSION }}
           
-          # Remove "v" prefix if it exists
-          CLEAN_VERSION=${BASE_VERSION#v}
-          
           # Initialize the next version with the current base version
-          NEXT_VERSION=$CLEAN_VERSION
+          NEXT_VERSION=$BASE_VERSION
           
           # Split version into major, minor, patch
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$CLEAN_VERSION"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE_VERSION"
           PATCH=${PATCH:-0}
           
           # Loop to find the next available patch version
@@ -51,6 +63,9 @@ jobs:
 
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
 
+      - name: Build with Maven
+        run: mvn clean package -Dproject.version=${{ env.FINAL_VERSION }}
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -59,7 +74,7 @@ jobs:
         with:
           tag_name: ${{ env.FINAL_VERSION }}
           release_name: ${{ env.FINAL_VERSION }}
-          body: ${{ github.event.head_commit.message }}
+          body: ${{ env.DESCRIPTION }}
           draft: false
           prerelease: false
 
