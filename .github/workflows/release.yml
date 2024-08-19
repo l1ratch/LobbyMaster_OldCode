@@ -52,7 +52,7 @@ jobs:
             NEXT_VERSION="$BASE_VERSION.$PATCH"
           done
 
-          FINAL_VERSION="$NEXT_VERSION"  # Убираем префикс 'v' для соответствия имени файла
+          FINAL_VERSION="v$NEXT_VERSION"
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
           echo "Determined next available version: $FINAL_VERSION"
 
@@ -62,6 +62,15 @@ jobs:
       - name: Check if JAR file exists
         run: ls -lh target/
 
+      - name: Rename JAR file to match version
+        run: |
+          JAR_FILE=$(ls target/LobbyMaster-*.jar | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "JAR file not found!"
+            exit 1
+          fi
+          mv "$JAR_FILE" "target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar"
+
       - name: Install GitHub CLI
         run: sudo apt-get install gh
 
@@ -70,4 +79,4 @@ jobs:
 
       - name: Create GitHub Release using gh cli
         run: |
-          gh release create v${{ env.FINAL_VERSION }} target/LobbyMaster-${{ env.FINAL_VERSION }}.jar --title "v${{ env.FINAL_VERSION }}" --notes "${{ env.DESCRIPTION }}"
+          gh release create ${{ env.FINAL_VERSION }} target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar --title "${{ env.FINAL_VERSION }}" --notes "${{ env.DESCRIPTION }}"
