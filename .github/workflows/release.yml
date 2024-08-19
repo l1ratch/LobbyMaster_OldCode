@@ -52,7 +52,7 @@ jobs:
             NEXT_VERSION="$BASE_VERSION.$PATCH"
           done
 
-          FINAL_VERSION="v$NEXT_VERSION"
+          FINAL_VERSION="$NEXT_VERSION"  # Убираем префикс 'v' для соответствия имени файла
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
           echo "Determined next available version: $FINAL_VERSION"
 
@@ -70,4 +70,4 @@ jobs:
 
       - name: Create GitHub Release using gh cli
         run: |
-          gh release create ${{ env.FINAL_VERSION }} target/LobbyMaster-${{ env.FINAL_VERSION }}.jar --title "${{ env.FINAL_VERSION }}" --notes "${{ env.DESCRIPTION }}"
+          gh release create v${{ env.FINAL_VERSION }} target/LobbyMaster-${{ env.FINAL_VERSION }}.jar --title "v${{ env.FINAL_VERSION }}" --notes "${{ env.DESCRIPTION }}"
