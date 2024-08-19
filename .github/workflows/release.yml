@@ -75,7 +75,7 @@ jobs:
         run: sudo apt-get install gh
 
       - name: Authenticate with GitHub CLI
-        run: gh auth login --with-token <<< ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: echo "${{ secrets.TOKEN }}" | gh auth login --with-token
 
       - name: Create GitHub Release using gh cli
         run: |
