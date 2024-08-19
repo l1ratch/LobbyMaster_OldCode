@@ -24,6 +24,12 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
 
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
+
+      - name: Authenticate with GitHub CLI
+        run: gh auth login --with-token <<< ${{ secrets.TOKEN }}
+
       - name: Extract version and description from commit message
         id: extract_info
         run: |
@@ -40,9 +46,6 @@ jobs:
           
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
-
-      - name: List all tags for debugging
-        run: git tag -l
 
       - name: Determine the next available version
         id: determine_version
@@ -76,22 +79,6 @@ jobs:
           fi
           mv "$JAR_FILE" "target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar"
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Используйте личный токен (PAT)
-        with:
-          tag_name: ${{ env.FINAL_VERSION }}
-          release_name: ${{ env.FINAL_VERSION }}
-          body: ${{ env.DESCRIPTION }}
-          draft: false
-          prerelease: false
-
-      - name: Upload .jar to Release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar
-          asset_name: LobbyMaster-${{ env.FINAL_VERSION }}.jar
-          asset_content_type: application/java-archive
+      - name: Create GitHub Release using gh cli
+        run: |
+          gh release create ${{ env.FINAL_VERSION }} target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar --title "${{ env.FINAL_VERSION }}" --notes "${{ env.DESCRIPTION }}"
