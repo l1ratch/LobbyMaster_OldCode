@@ -24,27 +24,20 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
 
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh
-
-      - name: Authenticate with GitHub CLI
-        run: gh auth login --with-token <<< ${{ secrets.TOKEN }}
-
-      - name: Extract version and description from commit message
-        id: extract_info
+      - name: Extract version from pom.xml
+        id: extract_version
         run: |
-          VERSION=$(git log -1 --pretty=%B | grep -oP 'int_ver: \K[\d.]+')
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           if [ -z "$VERSION" ]; then
-            echo "Version not found in commit message"
+            echo "Version not found in pom.xml"
             exit 1
           fi
-
-          DESCRIPTION=$(git log -1 --pretty=%B | grep -oP 'Изменения: \K.*')
-          if [ -z "$DESCRIPTION" ]; then
-            DESCRIPTION="No detailed description provided."
-          fi
-          
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Extract full commit message as description
+        id: extract_description
+        run: |
+          DESCRIPTION=$(git log -1 --pretty=%B)
           echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
 
       - name: Determine the next available version
@@ -60,7 +53,6 @@ jobs:
           done
 
           FINAL_VERSION="v$NEXT_VERSION"
-
           echo "FINAL_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
           echo "Determined next available version: $FINAL_VERSION"
 
@@ -78,6 +70,12 @@ jobs:
             exit 1
           fi
           mv "$JAR_FILE" "target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar"
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
+
+      - name: Authenticate with GitHub CLI
+        run: gh auth login --with-token <<< ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Create GitHub Release using gh cli
         run: |
