@@ -64,14 +64,23 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -Dproject.version=${{ env.FINAL_VERSION }}
 
+      - name: Check if JAR file exists
+        run: ls -lh target/
+
       - name: Rename JAR file to match version
-        run: mv target/LobbyMaster-*.jar target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar
+        run: |
+          JAR_FILE=$(ls target/LobbyMaster-*.jar | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "JAR file not found!"
+            exit 1
+          fi
+          mv "$JAR_FILE" "target/LobbyMaster-${{ env.FINAL_VERSION }}-shaded.jar"
 
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Убедитесь, что токен правильный
         with:
           tag_name: ${{ env.FINAL_VERSION }}
           release_name: ${{ env.FINAL_VERSION }}
