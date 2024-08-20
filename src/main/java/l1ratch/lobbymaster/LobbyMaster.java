@@ -40,7 +40,7 @@ public class LobbyMaster extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
 
-        // Зона работы с кфг
+        //PluginConfig
         final File f = new File(this.getDataFolder() + File.separator + "config.yml");
         if (!f.exists()) {
             saveDefaultConfig();
@@ -48,7 +48,7 @@ public class LobbyMaster extends JavaPlugin implements Listener {
         }
         loadConfig(getConfig());
 
-        // Зона запуска элементов плагина
+        //TimeControl
         if (getConfig().getBoolean("Time.Allow")) {
             for (World w : Bukkit.getServer().getWorlds()) {
                 w.setTime(getConfig().getLong("Time.SetTime"));
@@ -64,10 +64,16 @@ public class LobbyMaster extends JavaPlugin implements Listener {
         this.getCommand("gma").setExecutor(new Commands());
         this.getCommand("gmsp").setExecutor(new Commands());
 
+        //registerTabCompleter();
+        this.getCommand("lm").setTabCompleter(new TabLMcmd());
+
+        //BasicPluginLogic
         Bukkit.getPluginManager().registerEvents(new DonFunctions(), this);
         Bukkit.getPluginManager().registerEvents(new Messager(), this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new BlockCMD(), this);
+
+        //InfoNotice
         log("----------------------------------");
         log(" Плагин §aLobbyMaster §8включен!  ");
         log(" Написал: l1ratch                 ");
